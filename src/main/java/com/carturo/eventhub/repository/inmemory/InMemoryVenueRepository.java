@@ -3,6 +3,9 @@ package com.carturo.eventhub.repository.inmemory;
 import com.carturo.eventhub.entity.VenueEntity;
 import com.carturo.eventhub.repository.domain.VenueRepository;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -12,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Profile("inmemory")
 public class InMemoryVenueRepository implements VenueRepository {
 
-    private final Map<Long, VenueEntity> storage = new HashMap<>();
+    private final Map<Long, VenueEntity> storage = new LinkedHashMap<>();
     private final AtomicLong idCounter = new AtomicLong(1);
 
     @Override
@@ -25,8 +28,13 @@ public class InMemoryVenueRepository implements VenueRepository {
     }
 
     @Override
-    public List<VenueEntity> findAll() {
-        return new ArrayList<>(storage.values());
+    public Page<VenueEntity> findAll(Pageable pageable) {
+        List<VenueEntity> list = new ArrayList<>(storage.values());
+        int total = list.size();
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), total);
+        List<VenueEntity> content = start > end ? Collections.emptyList() : list.subList(start, end);
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
@@ -37,5 +45,11 @@ public class InMemoryVenueRepository implements VenueRepository {
     @Override
     public void delete(Long id) {
         storage.remove(id);
+    }
+
+    @Override
+    public boolean existsByNameIgnoreCase(String name) {
+        return storage.values().stream()
+                .anyMatch(v -> v.getName() != null && v.getName().equalsIgnoreCase(name));
     }
 }

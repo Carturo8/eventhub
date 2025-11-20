@@ -4,10 +4,11 @@ import com.carturo.eventhub.entity.VenueEntity;
 import com.carturo.eventhub.repository.domain.VenueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,8 +24,8 @@ public class VenueJpaRepositoryAdapter implements VenueRepository {
     }
 
     @Override
-    public List<VenueEntity> findAll() {
-        return repository.findAll();
+    public Page<VenueEntity> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override
@@ -37,6 +38,12 @@ public class VenueJpaRepositoryAdapter implements VenueRepository {
         repository.deleteById(id);
     }
 
+    @Override
+    public boolean existsByNameIgnoreCase(String name) {
+        return repository.existsByNameIgnoreCase(name);
+    }
+
     interface SpringDataVenueRepository extends JpaRepository<VenueEntity, Long> {
+        boolean existsByNameIgnoreCase(String name);
     }
 }
