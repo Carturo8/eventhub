@@ -1,120 +1,58 @@
 package com.carturo.eventhub.controller;
 
-import com.carturo.eventhub.dto.EventDTO;
-import com.carturo.eventhub.exception.ApiError;
+import com.carturo.eventhub.docs.EventControllerDoc;
+import com.carturo.eventhub.dto.request.EventRequest;
+import com.carturo.eventhub.dto.response.EventResponse;
 import com.carturo.eventhub.service.EventService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.LocalDate;
 
-@Tag(name = "Events", description = "Endpoints for managing events")
 @RestController
 @RequestMapping("/events")
-public class EventController {
+@RequiredArgsConstructor
+public class EventController implements EventControllerDoc {
 
     private final EventService eventService;
 
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
-    }
-
-    @Operation(
-            summary = "Create a new event",
-            description = "Registers a new event in the in-memory catalog",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Event created successfully",
-                            content = @Content(schema = @Schema(implementation = EventDTO.class))),
-                    @ApiResponse(responseCode = "400", description = "Invalid event data",
-                            content = @Content(schema = @Schema(implementation = ApiError.class)))
-            }
-    )
+    @Override
     @PostMapping
-    public ResponseEntity<?> createEvent(@Valid @RequestBody EventDTO event) {
-        EventDTO createdEvent = eventService.create(event);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
+    public EventResponse createEvent(@RequestBody EventRequest request) {
+        return eventService.create(request);
     }
 
-    @Operation(
-            summary = "Get all events",
-            description = "Retrieves the list of all events stored in memory",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "List retrieved successfully",
-                            content = @Content(schema = @Schema(implementation = EventDTO.class)))
-            }
-    )
+    @Override
     @GetMapping
-    public ResponseEntity<List<EventDTO>> getAllEvents() {
-        return ResponseEntity.ok(eventService.findAll());
+    public Page<EventResponse> getEvents(
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable
+    ) {
+        return eventService.search(city, category, startDate, pageable);
     }
 
-    @Operation(
-            summary = "Get event by ID",
-            description = "Retrieves an event by its unique ID",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Event found",
-                            content = @Content(schema = @Schema(implementation = EventDTO.class))),
-                    @ApiResponse(responseCode = "404", description = "Event not found",
-                            content = @Content(schema = @Schema(implementation = ApiError.class)))
-            }
-    )
+    @Override
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEventById(@PathVariable Long id) {
-        EventDTO event = eventService.findById(id);
-        if (event == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new ApiError(404, "Event not found"));
-        }
-        return ResponseEntity.ok(event);
+    public EventResponse getEventById(@PathVariable Long id) {
+        return eventService.findById(id);
     }
 
-    @Operation(
-            summary = "Update an event",
-            description = "Updates the details of an existing event",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Event updated successfully",
-                            content = @Content(schema = @Schema(implementation = EventDTO.class))),
-                    @ApiResponse(responseCode = "404", description = "Event not found",
-                            content = @Content(schema = @Schema(implementation = ApiError.class)))
-            }
-    )
+    @Override
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEvent(@PathVariable Long id, @Valid @RequestBody EventDTO updatedEvent) {
-        EventDTO event = eventService.update(id, updatedEvent);
-        if (event == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new ApiError(404, "Event not found"));
-        }
-        return ResponseEntity.ok(event);
+    public EventResponse updateEvent(@PathVariable Long id, @RequestBody EventRequest request) {
+        return eventService.update(id, request);
     }
 
-    @Operation(
-            summary = "Delete an event",
-            description = "Removes an event from the catalog by its ID",
-            responses = {
-                    @ApiResponse(responseCode = "204", description = "Event deleted successfully"),
-                    @ApiResponse(responseCode = "404", description = "Event not found",
-                            content = @Content(schema = @Schema(implementation = ApiError.class)))
-            }
-    )
+    @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
-        EventDTO event = eventService.findById(id);
-        if (event == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new ApiError(404, "Event not found"));
-        }
+    public void deleteEvent(@PathVariable Long id) {
         eventService.delete(id);
-        return ResponseEntity.noContent().build();
     }
 }
