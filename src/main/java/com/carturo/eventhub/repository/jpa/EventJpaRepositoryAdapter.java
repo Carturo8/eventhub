@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -18,7 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class EventJpaRepositoryAdapter implements EventRepository {
 
-    private final SpringDataEventRepository repository;
+    private final EventJpaRepository repository;
 
     @Override
     public EventEntity save(EventEntity event) {
@@ -48,9 +46,5 @@ public class EventJpaRepositoryAdapter implements EventRepository {
     @Override
     public Page<EventEntity> search(String city, String category, LocalDate startDate, Pageable pageable) {
         return repository.findAll(EventSpecifications.withFilters(city, category, startDate), pageable);
-    }
-
-    interface SpringDataEventRepository extends JpaRepository<EventEntity, Long>, JpaSpecificationExecutor<EventEntity> {
-        boolean existsByNameIgnoreCase(String name);
     }
 }
