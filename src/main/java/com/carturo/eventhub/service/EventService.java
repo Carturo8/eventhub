@@ -1,12 +1,17 @@
 package com.carturo.eventhub.service;
 
-import com.carturo.eventhub.dto.EventDTO;
-import java.util.List;
+import com.carturo.eventhub.dto.request.EventRequest;
+import com.carturo.eventhub.dto.response.EventResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDate;
 
 public interface EventService {
-    EventDTO create(EventDTO event);
-    List<EventDTO> findAll();
-    EventDTO findById(Long id);
-    EventDTO update(Long id, EventDTO event);
+    EventResponse create(EventRequest request);
+    Page<EventResponse> findAll(Pageable pageable);
+    EventResponse findById(Long id);
+    EventResponse update(Long id, EventRequest request);
     void delete(Long id);
+    Page<EventResponse> search(String city, String category, LocalDate startDate, Pageable pageable);
 }
