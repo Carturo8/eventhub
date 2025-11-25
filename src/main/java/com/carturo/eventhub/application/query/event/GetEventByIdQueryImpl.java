@@ -3,6 +3,7 @@ package com.carturo.eventhub.application.query.event;
 import com.carturo.eventhub.domain.model.Event;
 import com.carturo.eventhub.domain.ports.in.query.event.GetEventByIdQuery;
 import com.carturo.eventhub.domain.ports.out.EventRepositoryPort;
+import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
 
 public class GetEventByIdQueryImpl implements GetEventByIdQuery {
 
@@ -15,6 +16,6 @@ public class GetEventByIdQueryImpl implements GetEventByIdQuery {
     @Override
     public Event get(Long id) {
         return eventRepositoryPort.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 }

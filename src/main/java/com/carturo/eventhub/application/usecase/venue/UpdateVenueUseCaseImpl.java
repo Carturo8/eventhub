@@ -3,6 +3,7 @@ package com.carturo.eventhub.application.usecase.venue;
 import com.carturo.eventhub.domain.model.Venue;
 import com.carturo.eventhub.domain.ports.in.command.venue.UpdateVenueUseCase;
 import com.carturo.eventhub.domain.ports.out.VenueRepositoryPort;
+import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
 
 public class UpdateVenueUseCaseImpl implements UpdateVenueUseCase {
 
@@ -16,7 +17,7 @@ public class UpdateVenueUseCaseImpl implements UpdateVenueUseCase {
     public Venue update(Long id, Venue venue) {
 
         Venue existing = venueRepositoryPort.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Venue not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found"));
 
         existing.setName(venue.getName());
         existing.setCity(venue.getCity());
