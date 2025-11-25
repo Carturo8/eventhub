@@ -3,3 +3,10 @@ spring:
     name: eventhub
   profiles:
     active: dev
+
+server:
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: always
+    include-binding-errors: never

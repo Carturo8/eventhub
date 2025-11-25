@@ -4,6 +4,3 @@ server:
 spring:
   application:
     name: EventHub - InMemory
-
-  profiles:
-    active: inmemory

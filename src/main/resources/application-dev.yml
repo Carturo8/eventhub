@@ -2,9 +2,6 @@ server:
   port: 8080
 
 spring:
-  application:
-    name: EventHub - Development
-
   datasource:
     url: jdbc:h2:mem:eventhubdb
     driver-class-name: org.h2.Driver
