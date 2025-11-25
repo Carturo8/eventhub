@@ -1,6 +1,6 @@
-package com.carturo.eventhub.repository.jpa;
+package com.carturo.eventhub.infrastructure.adapters.out.jpa;
 
-import com.carturo.eventhub.entity.EventEntity;
+import com.carturo.eventhub.infrastructure.adapters.out.jpa.entity.EventEntity;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;
 

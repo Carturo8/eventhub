@@ -1,6 +1,6 @@
-package com.carturo.eventhub.repository.jpa;
+package com.carturo.eventhub.infrastructure.adapters.out.jpa;
 
-import com.carturo.eventhub.entity.VenueEntity;
+import com.carturo.eventhub.infrastructure.adapters.out.jpa.entity.VenueEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
