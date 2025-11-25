@@ -7,6 +7,7 @@ import com.carturo.eventhub.domain.ports.in.command.event.UpdateEventUseCase;
 import com.carturo.eventhub.domain.ports.in.query.event.GetEventByIdQuery;
 import com.carturo.eventhub.domain.ports.in.query.event.ListEventsQuery;
 import com.carturo.eventhub.domain.ports.in.query.event.SearchEventsQuery;
+import com.carturo.eventhub.domain.ports.in.query.venue.GetVenueByIdQuery;
 import com.carturo.eventhub.infrastructure.adapters.in.web.dto.request.EventRequest;
 import com.carturo.eventhub.infrastructure.adapters.in.web.dto.response.EventResponse;
 import com.carturo.eventhub.infrastructure.adapters.in.web.mapper.EventWebMapper;
@@ -37,6 +38,7 @@ public class EventController {
     private final GetEventByIdQuery getEventByIdQuery;
     private final ListEventsQuery listEventsQuery;
     private final SearchEventsQuery searchEventsQuery;
+    private final GetVenueByIdQuery getVenueByIdQuery;
     private final EventWebMapper mapper;
 
     public EventController(
@@ -46,6 +48,7 @@ public class EventController {
             GetEventByIdQuery getEventByIdQuery,
             ListEventsQuery listEventsQuery,
             SearchEventsQuery searchEventsQuery,
+            GetVenueByIdQuery getVenueByIdQuery,
             EventWebMapper mapper
     ) {
         this.createEventUseCase = createEventUseCase;
@@ -54,6 +57,7 @@ public class EventController {
         this.getEventByIdQuery = getEventByIdQuery;
         this.listEventsQuery = listEventsQuery;
         this.searchEventsQuery = searchEventsQuery;
+        this.getVenueByIdQuery = getVenueByIdQuery;
         this.mapper = mapper;
     }
 
@@ -63,13 +67,17 @@ public class EventController {
             responses = {
                     @ApiResponse(responseCode = "201", description = "Event created successfully",
                             content = @Content(schema = @Schema(implementation = EventResponse.class))),
-                    @ApiResponse(responseCode = "400", description = "Invalid event data", content = @Content)
+                    @ApiResponse(responseCode = "400", description = "Invalid event data", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Venue not found", content = @Content)
             }
     )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EventResponse createEvent(@Valid @RequestBody EventRequest request) {
         Event event = mapper.toDomain(request);
+        var venue = getVenueByIdQuery.get(request.venueId());
+        if (venue == null) throw new ResourceNotFoundException("Venue not found");
+        event.setVenue(venue);
         Event created = createEventUseCase.create(event);
         return mapper.toResponse(created);
     }
@@ -128,12 +136,15 @@ public class EventController {
                     @ApiResponse(responseCode = "200", description = "Event updated",
                             content = @Content(schema = @Schema(implementation = EventResponse.class))),
                     @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Event not found", content = @Content)
+                    @ApiResponse(responseCode = "404", description = "Event not found or venue not found", content = @Content)
             }
     )
     @PutMapping("/{id}")
     public EventResponse updateEvent(@PathVariable Long id, @Valid @RequestBody EventRequest request) {
         Event event = mapper.toDomain(request);
+        var venue = getVenueByIdQuery.get(request.venueId());
+        if (venue == null) throw new ResourceNotFoundException("Venue not found");
+        event.setVenue(venue);
         Event updated = updateEventUseCase.update(id, event);
         return mapper.toResponse(updated);
     }
