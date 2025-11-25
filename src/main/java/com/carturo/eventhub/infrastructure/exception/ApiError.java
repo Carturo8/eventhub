@@ -1,4 +1,4 @@
-package com.carturo.eventhub.exception;
+package com.carturo.eventhub.infrastructure.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
