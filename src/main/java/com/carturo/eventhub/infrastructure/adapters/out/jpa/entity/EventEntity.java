@@ -1,4 +1,4 @@
-package com.carturo.eventhub.entity;
+package com.carturo.eventhub.infrastructure.adapters.out.jpa.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
