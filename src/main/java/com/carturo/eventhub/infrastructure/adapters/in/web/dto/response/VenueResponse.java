@@ -1,4 +1,4 @@
-package com.carturo.eventhub.dto.response;
+package com.carturo.eventhub.infrastructure.adapters.in.web.dto.response;
 
 public record VenueResponse(
         Long id,

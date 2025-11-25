@@ -1,4 +1,4 @@
-package com.carturo.eventhub.dto.response;
+package com.carturo.eventhub.infrastructure.adapters.in.web.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;

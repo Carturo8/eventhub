@@ -1,4 +1,4 @@
-package com.carturo.eventhub.dto.request;
+package com.carturo.eventhub.infrastructure.adapters.in.web.dto.request;
 
 import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
