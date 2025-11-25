@@ -1,8 +1,8 @@
-package com.carturo.eventhub.controller;
+package com.carturo.eventhub.infrastructure.adapters.in.web;
 
-import com.carturo.eventhub.docs.VenueControllerDoc;
-import com.carturo.eventhub.dto.request.VenueRequest;
-import com.carturo.eventhub.dto.response.VenueResponse;
+import com.carturo.eventhub.infrastructure.adapters.in.web.doc.VenueControllerDoc;
+import com.carturo.eventhub.infrastructure.adapters.in.web.dto.request.VenueRequest;
+import com.carturo.eventhub.infrastructure.adapters.in.web.dto.response.VenueResponse;
 import com.carturo.eventhub.service.VenueService;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
