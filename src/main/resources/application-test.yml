@@ -2,9 +2,6 @@ server:
   port: 8081
 
 spring:
-  application:
-    name: EventHub - Testing
-
   datasource:
     url: jdbc:h2:mem:eventhubtestdb
     driver-class-name: org.h2.Driver
