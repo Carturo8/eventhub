@@ -1,6 +1,10 @@
 spring:
   application:
     name: eventhub
+
+  config:
+    import: optional:application-local.yml
+
   profiles:
     active: dev
 
