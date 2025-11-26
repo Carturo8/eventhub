@@ -7,15 +7,20 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EventJpaRepository extends JpaRepository<EventEntity, Long>, JpaSpecificationExecutor<EventEntity> {
     boolean existsByNameIgnoreCase(String name);
 
+    @Override
+    @NonNull
     @EntityGraph(attributePaths = {"venue"})
-    Page<EventEntity> findAll(Pageable pageable);
+    Page<EventEntity> findAll(@NonNull Pageable pageable);
 
+    @Override
+    @NonNull
     @EntityGraph(attributePaths = {"venue"})
-    Page<EventEntity> findAll(Specification<EventEntity> spec, Pageable pageable);
+    Page<EventEntity> findAll(@NonNull Specification<EventEntity> spec, @NonNull Pageable pageable);
 }
