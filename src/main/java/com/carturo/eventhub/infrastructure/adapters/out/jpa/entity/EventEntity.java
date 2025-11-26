@@ -1,5 +1,7 @@
 package com.carturo.eventhub.infrastructure.adapters.out.jpa.entity;
 
+import com.carturo.eventhub.domain.model.event.EventCategory;
+import com.carturo.eventhub.domain.model.event.EventStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -25,16 +27,21 @@ public class EventEntity {
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(nullable = true, length = 500)
+    @Column(length = 500)
     private String description;
 
-    @Column(nullable = true, length = 100)
-    private String category;
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LocalDate date;
+    private EventCategory category;
+
+    @Column(name = "event_date", nullable = false)
+    private LocalDate eventDate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id", nullable = false)
     private VenueEntity venue;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventStatus status;
 }

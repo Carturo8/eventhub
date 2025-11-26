@@ -1,13 +1,14 @@
 package com.carturo.eventhub.application.query.event;
 
-import com.carturo.eventhub.domain.model.Event;
+import com.carturo.eventhub.domain.model.event.Event;
+import com.carturo.eventhub.domain.model.event.EventFilter;
 import com.carturo.eventhub.domain.model.pagination.PageRequest;
 import com.carturo.eventhub.domain.model.pagination.PageResult;
 import com.carturo.eventhub.domain.ports.in.query.event.SearchEventsQuery;
 import com.carturo.eventhub.domain.ports.out.EventRepositoryPort;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-
+@Transactional(readOnly = true)
 public class SearchEventsQueryImpl implements SearchEventsQuery {
 
     private final EventRepositoryPort eventRepositoryPort;
@@ -17,7 +18,7 @@ public class SearchEventsQueryImpl implements SearchEventsQuery {
     }
 
     @Override
-    public PageResult<Event> search(String city, String category, LocalDate startDate, PageRequest pageRequest) {
-        return eventRepositoryPort.search(city, category, startDate, pageRequest);
+    public PageResult<Event> search(EventFilter filter, PageRequest pageRequest) {
+        return eventRepositoryPort.search(filter, pageRequest);
     }
 }

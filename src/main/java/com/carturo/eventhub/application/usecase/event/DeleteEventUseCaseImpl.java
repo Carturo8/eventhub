@@ -3,7 +3,9 @@ package com.carturo.eventhub.application.usecase.event;
 import com.carturo.eventhub.domain.ports.in.command.event.DeleteEventUseCase;
 import com.carturo.eventhub.domain.ports.out.EventRepositoryPort;
 import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class DeleteEventUseCaseImpl implements DeleteEventUseCase {
 
     private final EventRepositoryPort eventRepositoryPort;
@@ -14,8 +16,10 @@ public class DeleteEventUseCaseImpl implements DeleteEventUseCase {
 
     @Override
     public void delete(Long id) {
-        boolean exists = eventRepositoryPort.findById(id).isPresent();
-        if (!exists) {
+        if (id == null) {
+            throw new IllegalArgumentException("Event ID must not be null");
+        }
+        if (eventRepositoryPort.findById(id).isEmpty()) {
             throw new ResourceNotFoundException("Event not found");
         }
         eventRepositoryPort.delete(id);

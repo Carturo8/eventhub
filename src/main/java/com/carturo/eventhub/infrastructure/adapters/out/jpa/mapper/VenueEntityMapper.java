@@ -1,6 +1,6 @@
 package com.carturo.eventhub.infrastructure.adapters.out.jpa.mapper;
 
-import com.carturo.eventhub.domain.model.Venue;
+import com.carturo.eventhub.domain.model.venue.Venue;
 import com.carturo.eventhub.infrastructure.adapters.out.jpa.entity.VenueEntity;
 import org.mapstruct.Mapper;
 

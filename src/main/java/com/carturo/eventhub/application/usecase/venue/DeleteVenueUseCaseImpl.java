@@ -3,7 +3,9 @@ package com.carturo.eventhub.application.usecase.venue;
 import com.carturo.eventhub.domain.ports.in.command.venue.DeleteVenueUseCase;
 import com.carturo.eventhub.domain.ports.out.VenueRepositoryPort;
 import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class DeleteVenueUseCaseImpl implements DeleteVenueUseCase {
 
     private final VenueRepositoryPort venueRepositoryPort;
@@ -14,8 +16,10 @@ public class DeleteVenueUseCaseImpl implements DeleteVenueUseCase {
 
     @Override
     public void delete(Long id) {
-        boolean exists = venueRepositoryPort.findById(id).isPresent();
-        if (!exists) {
+        if (id == null) {
+            throw new IllegalArgumentException("Venue ID must not be null");
+        }
+        if (venueRepositoryPort.findById(id).isEmpty()) {
             throw new ResourceNotFoundException("Venue not found");
         }
         venueRepositoryPort.delete(id);

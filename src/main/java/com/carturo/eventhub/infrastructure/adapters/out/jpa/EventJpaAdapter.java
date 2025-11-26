@@ -1,21 +1,20 @@
 package com.carturo.eventhub.infrastructure.adapters.out.jpa;
 
-import com.carturo.eventhub.domain.model.Event;
+import com.carturo.eventhub.domain.model.event.Event;
+import com.carturo.eventhub.domain.model.event.EventFilter;
 import com.carturo.eventhub.domain.model.pagination.PageRequest;
 import com.carturo.eventhub.domain.model.pagination.PageResult;
 import com.carturo.eventhub.domain.ports.out.EventRepositoryPort;
 import com.carturo.eventhub.infrastructure.adapters.out.jpa.entity.EventEntity;
 import com.carturo.eventhub.infrastructure.adapters.out.jpa.mapper.EventEntityMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 @Component
-@Profile("dev")
 @RequiredArgsConstructor
 public class EventJpaAdapter implements EventRepositoryPort {
 
@@ -31,17 +30,17 @@ public class EventJpaAdapter implements EventRepositoryPort {
 
     @Override
     public Optional<Event> findById(Long id) {
-        return repository.findById(id)
-                .map(mapper::toDomain);
+        return repository.findById(id).map(mapper::toDomain);
     }
 
     @Override
     public PageResult<Event> findAll(PageRequest pageRequest) {
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                pageRequest.page(),
+                pageRequest.size()
+        );
 
-        Pageable pageable = Pageable.ofSize(pageRequest.size())
-                .withPage(pageRequest.page());
-
-        var page = repository.findAll(pageable);
+        Page<EventEntity> page = repository.findAll(pageable);
 
         return new PageResult<>(
                 page.getContent().stream().map(mapper::toDomain).toList(),
@@ -53,13 +52,14 @@ public class EventJpaAdapter implements EventRepositoryPort {
     }
 
     @Override
-    public PageResult<Event> search(String city, String category, LocalDate startDate, PageRequest pageRequest) {
+    public PageResult<Event> search(EventFilter filter, PageRequest pageRequest) {
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                pageRequest.page(),
+                pageRequest.size()
+        );
 
-        Pageable pageable = Pageable.ofSize(pageRequest.size())
-                .withPage(pageRequest.page());
-
-        var page = repository.findAll(
-                EventSpecifications.withFilters(city, category, startDate),
+        Page<EventEntity> page = repository.findAll(
+                EventSpecifications.withFilters(filter),
                 pageable
         );
 

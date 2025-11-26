@@ -1,7 +1,8 @@
 package com.carturo.eventhub.domain.ports.in.query.event;
 
-import com.carturo.eventhub.domain.model.Event;
+import com.carturo.eventhub.domain.model.event.Event;
+import java.util.Optional;
 
 public interface GetEventByIdQuery {
-    Event get(Long id);
+    Optional<Event> get(Long id);
 }

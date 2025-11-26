@@ -1,4 +1,4 @@
-package com.carturo.eventhub.domain.model;
+package com.carturo.eventhub.domain.model.venue;
 
 public class Venue {
 

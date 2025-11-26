@@ -1,10 +1,12 @@
 package com.carturo.eventhub.application.query.venue;
 
-import com.carturo.eventhub.domain.model.Venue;
+import com.carturo.eventhub.domain.model.venue.Venue;
 import com.carturo.eventhub.domain.ports.in.query.venue.GetVenueByIdQuery;
 import com.carturo.eventhub.domain.ports.out.VenueRepositoryPort;
-import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
+@Transactional(readOnly = true)
 public class GetVenueByIdQueryImpl implements GetVenueByIdQuery {
 
     private final VenueRepositoryPort venueRepositoryPort;
@@ -14,8 +16,7 @@ public class GetVenueByIdQueryImpl implements GetVenueByIdQuery {
     }
 
     @Override
-    public Venue get(Long id) {
-        return venueRepositoryPort.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Venue not found"));
+    public Optional<Venue> get(Long id) {
+        return venueRepositoryPort.findById(id);
     }
 }

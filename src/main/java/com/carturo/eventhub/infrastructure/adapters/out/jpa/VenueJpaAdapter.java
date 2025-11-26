@@ -1,20 +1,20 @@
 package com.carturo.eventhub.infrastructure.adapters.out.jpa;
 
-import com.carturo.eventhub.domain.model.Venue;
 import com.carturo.eventhub.domain.model.pagination.PageRequest;
 import com.carturo.eventhub.domain.model.pagination.PageResult;
+import com.carturo.eventhub.domain.model.venue.Venue;
+import com.carturo.eventhub.domain.model.venue.VenueFilter;
 import com.carturo.eventhub.domain.ports.out.VenueRepositoryPort;
 import com.carturo.eventhub.infrastructure.adapters.out.jpa.entity.VenueEntity;
 import com.carturo.eventhub.infrastructure.adapters.out.jpa.mapper.VenueEntityMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-@Profile("dev")
 @RequiredArgsConstructor
 public class VenueJpaAdapter implements VenueRepositoryPort {
 
@@ -35,12 +35,16 @@ public class VenueJpaAdapter implements VenueRepositoryPort {
     }
 
     @Override
-    public PageResult<Venue> findAll(PageRequest pageRequest) {
+    public PageResult<Venue> findAll(PageRequest pageRequest, VenueFilter filter) {
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                pageRequest.page(),
+                pageRequest.size()
+        );
 
-        Pageable pageable = Pageable.ofSize(pageRequest.size())
-                .withPage(pageRequest.page());
-
-        var page = repository.findAll(pageable);
+        Page<VenueEntity> page = repository.findAll(
+                VenueSpecifications.withFilters(filter),
+                pageable
+        );
 
         return new PageResult<>(
                 page.getContent().stream().map(mapper::toDomain).toList(),

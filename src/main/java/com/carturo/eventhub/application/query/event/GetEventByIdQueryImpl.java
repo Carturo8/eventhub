@@ -1,10 +1,12 @@
 package com.carturo.eventhub.application.query.event;
 
-import com.carturo.eventhub.domain.model.Event;
+import com.carturo.eventhub.domain.model.event.Event;
 import com.carturo.eventhub.domain.ports.in.query.event.GetEventByIdQuery;
 import com.carturo.eventhub.domain.ports.out.EventRepositoryPort;
-import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
+@Transactional(readOnly = true)
 public class GetEventByIdQueryImpl implements GetEventByIdQuery {
 
     private final EventRepositoryPort eventRepositoryPort;
@@ -14,8 +16,7 @@ public class GetEventByIdQueryImpl implements GetEventByIdQuery {
     }
 
     @Override
-    public Event get(Long id) {
-        return eventRepositoryPort.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+    public Optional<Event> get(Long id) {
+        return eventRepositoryPort.findById(id);
     }
 }
