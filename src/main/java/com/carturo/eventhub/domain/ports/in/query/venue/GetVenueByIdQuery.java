@@ -1,7 +1,8 @@
 package com.carturo.eventhub.domain.ports.in.query.venue;
 
-import com.carturo.eventhub.domain.model.Venue;
+import com.carturo.eventhub.domain.model.venue.Venue;
+import java.util.Optional;
 
 public interface GetVenueByIdQuery {
-    Venue get(Long id);
+    Optional<Venue> get(Long id);
 }
