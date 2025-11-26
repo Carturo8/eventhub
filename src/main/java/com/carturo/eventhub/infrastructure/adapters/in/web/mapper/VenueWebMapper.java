@@ -1,6 +1,6 @@
 package com.carturo.eventhub.infrastructure.adapters.in.web.mapper;
 
-import com.carturo.eventhub.domain.model.Venue;
+import com.carturo.eventhub.domain.model.venue.Venue;
 import com.carturo.eventhub.infrastructure.adapters.in.web.dto.request.VenueRequest;
 import com.carturo.eventhub.infrastructure.adapters.in.web.dto.response.VenueResponse;
 import org.mapstruct.Mapper;
