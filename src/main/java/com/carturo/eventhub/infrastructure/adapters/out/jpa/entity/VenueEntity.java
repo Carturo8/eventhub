@@ -2,6 +2,8 @@ package com.carturo.eventhub.infrastructure.adapters.out.jpa.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(
@@ -29,4 +31,13 @@ public class VenueEntity {
 
     @Column(nullable = false)
     private Integer capacity;
+
+    @Builder.Default
+    @OneToMany(
+            mappedBy = "venue",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<EventEntity> events = new ArrayList<>();
 }
