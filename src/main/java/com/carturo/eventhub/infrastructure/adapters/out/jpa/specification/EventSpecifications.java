@@ -1,4 +1,4 @@
-package com.carturo.eventhub.infrastructure.adapters.out.jpa;
+package com.carturo.eventhub.infrastructure.adapters.out.jpa.specification;
 
 import com.carturo.eventhub.domain.model.event.EventFilter;
 import com.carturo.eventhub.infrastructure.adapters.out.jpa.entity.EventEntity;
