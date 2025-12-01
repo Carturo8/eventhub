@@ -3,7 +3,7 @@ package com.carturo.eventhub.application.usecase.event;
 import com.carturo.eventhub.domain.model.event.Event;
 import com.carturo.eventhub.domain.ports.in.command.event.UpdateEventUseCase;
 import com.carturo.eventhub.domain.ports.out.EventRepositoryPort;
-import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
+import com.carturo.eventhub.application.exception.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -27,7 +27,8 @@ public class UpdateEventUseCaseImpl implements UpdateEventUseCase {
         existing.setName(event.getName());
         existing.setDescription(event.getDescription());
         existing.setCategory(event.getCategory());
-        existing.setEventDate(event.getEventDate());
+        existing.setStartDate(event.getStartDate());
+        existing.setEndDate(event.getEndDate());
         existing.setVenue(event.getVenue());
         existing.setStatus(event.getStatus());
 

@@ -3,7 +3,7 @@ package com.carturo.eventhub.application.usecase.venue;
 import com.carturo.eventhub.domain.model.venue.Venue;
 import com.carturo.eventhub.domain.ports.in.command.venue.UpdateVenueUseCase;
 import com.carturo.eventhub.domain.ports.out.VenueRepositoryPort;
-import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
+import com.carturo.eventhub.application.exception.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional

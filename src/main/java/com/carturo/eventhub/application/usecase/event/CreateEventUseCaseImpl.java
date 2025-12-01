@@ -3,7 +3,7 @@ package com.carturo.eventhub.application.usecase.event;
 import com.carturo.eventhub.domain.model.event.Event;
 import com.carturo.eventhub.domain.ports.in.command.event.CreateEventUseCase;
 import com.carturo.eventhub.domain.ports.out.EventRepositoryPort;
-import com.carturo.eventhub.infrastructure.exception.DuplicateResourceException;
+import com.carturo.eventhub.application.exception.DuplicateResourceException;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
