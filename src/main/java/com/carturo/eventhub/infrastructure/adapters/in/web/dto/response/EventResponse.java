@@ -11,7 +11,9 @@ public record EventResponse(
         String description,
         EventCategory category,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        LocalDate eventDate,
+        LocalDate startDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        LocalDate endDate,
         VenueResponse venue,
         EventStatus status
 ) {}
