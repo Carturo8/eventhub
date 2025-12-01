@@ -1,4 +1,4 @@
-package com.carturo.eventhub.infrastructure.exception;
+package com.carturo.eventhub.application.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {
