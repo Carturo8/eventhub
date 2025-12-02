@@ -14,3 +14,9 @@ server:
     include-exception: false
     include-message: always
     include-binding-errors: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
