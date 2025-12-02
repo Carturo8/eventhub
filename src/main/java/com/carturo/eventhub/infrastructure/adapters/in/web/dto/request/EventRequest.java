@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@DateRange(groups = {ValidationGroups.Create.class})
+@DateRange(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
 public class EventRequest {
 
     @NotBlank(message = "{validation.event.name.notBlank}", groups = {ValidationGroups.Create.class})
