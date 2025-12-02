@@ -18,6 +18,7 @@ import com.carturo.eventhub.infrastructure.adapters.in.web.dto.response.PageResp
 import com.carturo.eventhub.infrastructure.adapters.in.web.mapper.EventWebMapper;
 import com.carturo.eventhub.infrastructure.adapters.in.web.validation.ValidationGroups;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,6 +58,7 @@ public class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public EventResponse createEvent(@Validated(ValidationGroups.Create.class) @RequestBody EventRequest request) {
         Event event = mapper.toDomain(request);
 
@@ -69,6 +71,7 @@ public class EventController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public PageResponse<EventResponse> getEvents(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String category,
@@ -117,6 +120,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public EventResponse getEventById(@PathVariable Long id) {
         return getEventByIdQuery.get(id)
                 .map(mapper::toResponse)
@@ -124,6 +128,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public EventResponse updateEvent(@PathVariable Long id, @Validated(ValidationGroups.Update.class) @RequestBody EventRequest request) {
         Event event = mapper.toDomain(request);
 
@@ -137,6 +142,7 @@ public class EventController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteEvent(@PathVariable Long id) {
         deleteEventUseCase.delete(id);
     }

@@ -15,6 +15,7 @@ import com.carturo.eventhub.infrastructure.adapters.in.web.dto.response.VenueRes
 import com.carturo.eventhub.infrastructure.adapters.in.web.mapper.VenueWebMapper;
 import com.carturo.eventhub.infrastructure.adapters.in.web.validation.ValidationGroups;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +51,7 @@ public class VenueController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public VenueResponse createVenue(@Validated(ValidationGroups.Create.class) @RequestBody VenueRequest request) {
         Venue venue = mapper.toDomain(request);
         Venue created = createVenueUseCase.create(venue);
@@ -57,6 +59,7 @@ public class VenueController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public PageResponse<VenueResponse> getVenues(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) Integer minCapacity,
@@ -83,15 +86,15 @@ public class VenueController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public VenueResponse getVenueById(@PathVariable Long id) {
         return getVenueByIdQuery.get(id)
                 .map(mapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Venue not found with ID: " + id));
     }
 
-
-
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public VenueResponse updateVenue(@PathVariable Long id, @Validated(ValidationGroups.Update.class) @RequestBody VenueRequest request) {
         Venue venue = mapper.toDomain(request);
         Venue updated = updateVenueUseCase.update(id, venue);
@@ -100,6 +103,7 @@ public class VenueController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteVenue(@PathVariable Long id) {
         deleteVenueUseCase.delete(id);
     }
