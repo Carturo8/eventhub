@@ -3,6 +3,10 @@ package com.carturo.eventhub.infrastructure.adapters.in.web.exception;
 import com.carturo.eventhub.application.exception.DuplicateResourceException;
 import com.carturo.eventhub.application.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import io.micrometer.tracing.CurrentTraceContext;
+import io.micrometer.tracing.TraceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -14,14 +18,32 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private static final String TIMESTAMP = "timestamp";
     private static final String TRACE_ID = "traceId";
+    private static final String SPAN_ID = "spanId";
+
+    private final CurrentTraceContext currentTraceContext;
+
+    public GlobalExceptionHandler(CurrentTraceContext currentTraceContext) {
+        this.currentTraceContext = currentTraceContext;
+    }
+
+    private void addTracingInfoToProblemDetail(ProblemDetail problemDetail) {
+        TraceContext traceContext = currentTraceContext.context();
+        if (traceContext != null) {
+            problemDetail.setProperty(TRACE_ID, traceContext.traceId());
+            problemDetail.setProperty(SPAN_ID, traceContext.spanId());
+        } else {
+            problemDetail.setProperty(TRACE_ID, "N/A");
+            problemDetail.setProperty(SPAN_ID, "N/A");
+        }
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -31,7 +53,7 @@ public class GlobalExceptionHandler {
         problemDetail.setType(URI.create("https://example.com/docs/errors/validation"));
         problemDetail.setInstance(URI.create(request.getRequestURI()));
         problemDetail.setProperty(TIMESTAMP, Instant.now());
-        problemDetail.setProperty(TRACE_ID, UUID.randomUUID().toString());
+        addTracingInfoToProblemDetail(problemDetail);
 
         List<ValidationError> errors = ex.getBindingResult().getAllErrors().stream()
                 .map(err -> {
@@ -43,7 +65,7 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toList());
 
         problemDetail.setProperty("errors", errors);
-
+        log.warn("Validation failed for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         return problemDetail;
     }
 
@@ -54,7 +76,8 @@ public class GlobalExceptionHandler {
         problemDetail.setType(URI.create("https://example.com/docs/errors/invalid-argument"));
         problemDetail.setInstance(URI.create(request.getRequestURI()));
         problemDetail.setProperty(TIMESTAMP, Instant.now());
-        problemDetail.setProperty(TRACE_ID, UUID.randomUUID().toString());
+        addTracingInfoToProblemDetail(problemDetail);
+        log.warn("Invalid argument for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         return problemDetail;
     }
 
@@ -65,7 +88,8 @@ public class GlobalExceptionHandler {
         problemDetail.setType(URI.create("https://example.com/docs/errors/not-found"));
         problemDetail.setInstance(URI.create(request.getRequestURI()));
         problemDetail.setProperty(TIMESTAMP, Instant.now());
-        problemDetail.setProperty(TRACE_ID, UUID.randomUUID().toString());
+        addTracingInfoToProblemDetail(problemDetail);
+        log.warn("Resource not found for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         return problemDetail;
     }
 
@@ -76,7 +100,8 @@ public class GlobalExceptionHandler {
         problemDetail.setType(URI.create("https://example.com/docs/errors/duplicate-resource"));
         problemDetail.setInstance(URI.create(request.getRequestURI()));
         problemDetail.setProperty(TIMESTAMP, Instant.now());
-        problemDetail.setProperty(TRACE_ID, UUID.randomUUID().toString());
+        addTracingInfoToProblemDetail(problemDetail);
+        log.warn("Duplicate resource for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         return problemDetail;
     }
 
@@ -92,7 +117,8 @@ public class GlobalExceptionHandler {
         problemDetail.setType(URI.create("https://example.com/docs/errors/data-integrity"));
         problemDetail.setInstance(URI.create(request.getRequestURI()));
         problemDetail.setProperty(TIMESTAMP, Instant.now());
-        problemDetail.setProperty(TRACE_ID, UUID.randomUUID().toString());
+        addTracingInfoToProblemDetail(problemDetail);
+        log.error("Data integrity violation for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         return problemDetail;
     }
 
@@ -103,7 +129,8 @@ public class GlobalExceptionHandler {
         problemDetail.setType(URI.create("https://example.com/docs/errors/internal-error"));
         problemDetail.setInstance(URI.create(request.getRequestURI()));
         problemDetail.setProperty(TIMESTAMP, Instant.now());
-        problemDetail.setProperty(TRACE_ID, UUID.randomUUID().toString());
+        addTracingInfoToProblemDetail(problemDetail);
+        log.error("Unhandled exception for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         return problemDetail;
     }
 }
