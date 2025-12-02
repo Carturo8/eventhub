@@ -1,29 +1,46 @@
 package com.carturo.eventhub.infrastructure.adapters.in.web.dto.request;
 
 import com.carturo.eventhub.domain.model.event.EventCategory;
+import com.carturo.eventhub.infrastructure.adapters.in.web.validation.DateRange;
+import com.carturo.eventhub.infrastructure.adapters.in.web.validation.ValidationGroups;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
-public record EventRequest(
-        @NotBlank(message = "Event name cannot be empty")
-        @Size(max = 255, message = "Event name cannot exceed 255 characters")
-        String name,
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@DateRange(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+public class EventRequest {
 
-        @Size(max = 500, message = "Description cannot exceed 500 characters")
-        String description,
+    @NotBlank(message = "{validation.event.name.notBlank}", groups = {ValidationGroups.Create.class})
+    @Size(max = 255, message = "{validation.event.name.size}", groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    private String name;
 
-        @NotNull(message = "Event category cannot be null")
-        EventCategory category,
+    @Size(max = 500, message = "{validation.event.description.size}", groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    private String description;
 
-        @NotNull(message = "Event date cannot be null")
-        @FutureOrPresent(message = "Event date must be today or in the future")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        LocalDate eventDate,
+    @NotNull(message = "{validation.event.category.notNull}", groups = {ValidationGroups.Create.class})
+    private EventCategory category;
 
-        @NotNull(message = "Venue ID cannot be null")
-        Long venueId
-) {}
+    @NotNull(message = "{validation.event.startDate.notNull}", groups = {ValidationGroups.Create.class})
+    @FutureOrPresent(message = "{validation.event.startDate.futureOrPresent}", groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+
+    @NotNull(message = "{validation.event.endDate.notNull}", groups = {ValidationGroups.Create.class})
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
+
+    @NotNull(message = "{validation.event.venueId.notNull}", groups = {ValidationGroups.Create.class})
+    private Long venueId;
+}

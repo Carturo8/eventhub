@@ -1,5 +1,6 @@
-package com.carturo.eventhub.infrastructure.adapters.in.web;
+package com.carturo.eventhub.infrastructure.adapters.in.web.controller;
 
+import com.carturo.eventhub.application.exception.ResourceNotFoundException;
 import com.carturo.eventhub.domain.model.pagination.PageRequest;
 import com.carturo.eventhub.domain.model.venue.Venue;
 import com.carturo.eventhub.domain.model.venue.VenueFilter;
@@ -9,13 +10,13 @@ import com.carturo.eventhub.domain.ports.in.command.venue.UpdateVenueUseCase;
 import com.carturo.eventhub.domain.ports.in.query.venue.GetVenueByIdQuery;
 import com.carturo.eventhub.domain.ports.in.query.venue.ListVenuesQuery;
 import com.carturo.eventhub.infrastructure.adapters.in.web.dto.request.VenueRequest;
+import com.carturo.eventhub.infrastructure.adapters.in.web.dto.response.PageResponse;
 import com.carturo.eventhub.infrastructure.adapters.in.web.dto.response.VenueResponse;
 import com.carturo.eventhub.infrastructure.adapters.in.web.mapper.VenueWebMapper;
-import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
-import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import com.carturo.eventhub.infrastructure.adapters.in.web.validation.ValidationGroups;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,14 +51,16 @@ public class VenueController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public VenueResponse createVenue(@Valid @RequestBody VenueRequest request) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public VenueResponse createVenue(@Validated(ValidationGroups.Create.class) @RequestBody VenueRequest request) {
         Venue venue = mapper.toDomain(request);
         Venue created = createVenueUseCase.create(venue);
         return mapper.toResponse(created);
     }
 
     @GetMapping
-    public Page<VenueResponse> getVenues(
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public PageResponse<VenueResponse> getVenues(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) Integer minCapacity,
             @RequestParam(required = false) Integer maxCapacity,
@@ -72,14 +75,18 @@ public class VenueController {
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(
+        return new PageResponse<>(
                 content,
-                org.springframework.data.domain.PageRequest.of(pageResult.page(), pageResult.size()),
-                pageResult.totalItems()
+                pageResult.page(),
+                pageResult.size(),
+                pageResult.totalItems(),
+                pageResult.totalPages(),
+                pageResult.page() >= pageResult.totalPages() - 1
         );
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public VenueResponse getVenueById(@PathVariable Long id) {
         return getVenueByIdQuery.get(id)
                 .map(mapper::toResponse)
@@ -87,7 +94,8 @@ public class VenueController {
     }
 
     @PutMapping("/{id}")
-    public VenueResponse updateVenue(@PathVariable Long id, @Valid @RequestBody VenueRequest request) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public VenueResponse updateVenue(@PathVariable Long id, @Validated(ValidationGroups.Update.class) @RequestBody VenueRequest request) {
         Venue venue = mapper.toDomain(request);
         Venue updated = updateVenueUseCase.update(id, venue);
         return mapper.toResponse(updated);
@@ -95,6 +103,7 @@ public class VenueController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteVenue(@PathVariable Long id) {
         deleteVenueUseCase.delete(id);
     }

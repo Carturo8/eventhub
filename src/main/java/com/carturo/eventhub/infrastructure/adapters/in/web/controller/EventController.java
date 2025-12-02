@@ -1,5 +1,6 @@
-package com.carturo.eventhub.infrastructure.adapters.in.web;
+package com.carturo.eventhub.infrastructure.adapters.in.web.controller;
 
+import com.carturo.eventhub.application.exception.ResourceNotFoundException;
 import com.carturo.eventhub.domain.model.event.Event;
 import com.carturo.eventhub.domain.model.event.EventCategory;
 import com.carturo.eventhub.domain.model.event.EventFilter;
@@ -9,22 +10,16 @@ import com.carturo.eventhub.domain.ports.in.command.event.CreateEventUseCase;
 import com.carturo.eventhub.domain.ports.in.command.event.DeleteEventUseCase;
 import com.carturo.eventhub.domain.ports.in.command.event.UpdateEventUseCase;
 import com.carturo.eventhub.domain.ports.in.query.event.GetEventByIdQuery;
-import com.carturo.eventhub.domain.ports.in.query.event.ListEventsQuery;
 import com.carturo.eventhub.domain.ports.in.query.event.SearchEventsQuery;
 import com.carturo.eventhub.domain.ports.in.query.venue.GetVenueByIdQuery;
 import com.carturo.eventhub.infrastructure.adapters.in.web.dto.request.EventRequest;
 import com.carturo.eventhub.infrastructure.adapters.in.web.dto.response.EventResponse;
+import com.carturo.eventhub.infrastructure.adapters.in.web.dto.response.PageResponse;
 import com.carturo.eventhub.infrastructure.adapters.in.web.mapper.EventWebMapper;
-import com.carturo.eventhub.infrastructure.exception.ResourceNotFoundException;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import com.carturo.eventhub.infrastructure.adapters.in.web.validation.ValidationGroups;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -39,7 +34,6 @@ public class EventController {
     private final UpdateEventUseCase updateEventUseCase;
     private final DeleteEventUseCase deleteEventUseCase;
     private final GetEventByIdQuery getEventByIdQuery;
-    private final ListEventsQuery listEventsQuery;
     private final SearchEventsQuery searchEventsQuery;
     private final GetVenueByIdQuery getVenueByIdQuery;
     private final EventWebMapper mapper;
@@ -49,7 +43,6 @@ public class EventController {
             UpdateEventUseCase updateEventUseCase,
             DeleteEventUseCase deleteEventUseCase,
             GetEventByIdQuery getEventByIdQuery,
-            ListEventsQuery listEventsQuery,
             SearchEventsQuery searchEventsQuery,
             GetVenueByIdQuery getVenueByIdQuery,
             EventWebMapper mapper
@@ -58,7 +51,6 @@ public class EventController {
         this.updateEventUseCase = updateEventUseCase;
         this.deleteEventUseCase = deleteEventUseCase;
         this.getEventByIdQuery = getEventByIdQuery;
-        this.listEventsQuery = listEventsQuery;
         this.searchEventsQuery = searchEventsQuery;
         this.getVenueByIdQuery = getVenueByIdQuery;
         this.mapper = mapper;
@@ -66,11 +58,12 @@ public class EventController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventResponse createEvent(@Valid @RequestBody EventRequest request) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public EventResponse createEvent(@Validated(ValidationGroups.Create.class) @RequestBody EventRequest request) {
         Event event = mapper.toDomain(request);
 
-        var venue = getVenueByIdQuery.get(request.venueId())
-                .orElseThrow(() -> new ResourceNotFoundException("Venue not found with ID: " + request.venueId()));
+        var venue = getVenueByIdQuery.get(request.getVenueId())
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found with ID: " + request.getVenueId()));
         event.setVenue(venue);
 
         Event created = createEventUseCase.create(event);
@@ -78,7 +71,8 @@ public class EventController {
     }
 
     @GetMapping
-    public Page<EventResponse> getEvents(
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    public PageResponse<EventResponse> getEvents(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) LocalDate startDate,
@@ -115,14 +109,18 @@ public class EventController {
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(
+        return new PageResponse<>(
                 content,
-                org.springframework.data.domain.PageRequest.of(pageResult.page(), pageResult.size()),
-                pageResult.totalItems()
+                pageResult.page(),
+                pageResult.size(),
+                pageResult.totalItems(),
+                pageResult.totalPages(),
+                pageResult.page() >= pageResult.totalPages() - 1
         );
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public EventResponse getEventById(@PathVariable Long id) {
         return getEventByIdQuery.get(id)
                 .map(mapper::toResponse)
@@ -130,11 +128,12 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    public EventResponse updateEvent(@PathVariable Long id, @Valid @RequestBody EventRequest request) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public EventResponse updateEvent(@PathVariable Long id, @Validated(ValidationGroups.Update.class) @RequestBody EventRequest request) {
         Event event = mapper.toDomain(request);
 
-        var venue = getVenueByIdQuery.get(request.venueId())
-                .orElseThrow(() -> new ResourceNotFoundException("Venue not found with ID: " + request.venueId()));
+        var venue = getVenueByIdQuery.get(request.getVenueId())
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found with ID: " + request.getVenueId()));
         event.setVenue(venue);
 
         Event updated = updateEventUseCase.update(id, event);
@@ -143,6 +142,7 @@ public class EventController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteEvent(@PathVariable Long id) {
         deleteEventUseCase.delete(id);
     }

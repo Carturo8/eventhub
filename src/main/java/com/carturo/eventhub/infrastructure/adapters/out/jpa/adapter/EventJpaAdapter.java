@@ -1,12 +1,14 @@
-package com.carturo.eventhub.infrastructure.adapters.out.jpa;
+package com.carturo.eventhub.infrastructure.adapters.out.jpa.adapter;
 
 import com.carturo.eventhub.domain.model.event.Event;
 import com.carturo.eventhub.domain.model.event.EventFilter;
 import com.carturo.eventhub.domain.model.pagination.PageRequest;
 import com.carturo.eventhub.domain.model.pagination.PageResult;
 import com.carturo.eventhub.domain.ports.out.EventRepositoryPort;
+import com.carturo.eventhub.infrastructure.adapters.out.jpa.specification.EventSpecifications;
 import com.carturo.eventhub.infrastructure.adapters.out.jpa.entity.EventEntity;
 import com.carturo.eventhub.infrastructure.adapters.out.jpa.mapper.EventEntityMapper;
+import com.carturo.eventhub.infrastructure.adapters.out.jpa.repository.EventJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

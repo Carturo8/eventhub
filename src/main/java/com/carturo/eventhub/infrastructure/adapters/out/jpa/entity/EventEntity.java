@@ -34,8 +34,11 @@ public class EventEntity {
     @Column(nullable = false)
     private EventCategory category;
 
-    @Column(name = "event_date", nullable = false)
-    private LocalDate eventDate;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id", nullable = false)

@@ -9,7 +9,8 @@ public class Event {
     private String name;
     private String description;
     private EventCategory category;
-    private LocalDate eventDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Venue venue;
     private EventStatus status;
 
@@ -18,12 +19,13 @@ public class Event {
     }
 
     public Event(Long id, String name, String description, EventCategory category,
-                 LocalDate eventDate, Venue venue, EventStatus status) {
+                 LocalDate startDate, LocalDate endDate, Venue venue, EventStatus status) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.category = category;
-        this.eventDate = eventDate;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.venue = venue;
         this.status = status == null ? EventStatus.ACTIVE : status;
     }
@@ -40,8 +42,11 @@ public class Event {
     public EventCategory getCategory() { return category; }
     public void setCategory(EventCategory category) { this.category = category; }
 
-    public LocalDate getEventDate() { return eventDate; }
-    public void setEventDate(LocalDate eventDate) { this.eventDate = eventDate; }
+    public LocalDate getStartDate() { return startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+
+    public LocalDate getEndDate() { return endDate; }
+    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
 
     public Venue getVenue() { return venue; }
     public void setVenue(Venue venue) { this.venue = venue; }
