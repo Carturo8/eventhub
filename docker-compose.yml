@@ -11,10 +11,10 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       SPRING_PROFILES_ACTIVE: prod
       JWT_SECRET: ${JWT_SECRET}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      # EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
     depends_on:
       - db
-      - eureka-server
+      # - eureka-server
     networks:
       - eventhub-network
 
@@ -29,16 +29,16 @@ services:
     networks:
       - eventhub-network
 
-  eureka-server:
-    image: springcloud/eureka
-    ports:
-      - "8761:8761"
-    environment:
-      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
-      EUREKA_CLIENT_FETCH_REGISTRY: "false"
-      EUREKA_SERVER_WAIT_TIME_IN_MS_WHEN_EMPTY: "0"
-    networks:
-      - eventhub-network
+#  eureka-server:
+#    image: springcloud/eureka
+#    ports:
+#      - "8761:8761"
+#    environment:
+#      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+#      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+#      EUREKA_SERVER_WAIT_TIME_IN_MS_WHEN_EMPTY: "0"
+#    networks:
+#      - eventhub-network
 
 volumes:
   db-data:
