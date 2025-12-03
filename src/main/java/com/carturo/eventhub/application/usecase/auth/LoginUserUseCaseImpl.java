@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,11 +22,14 @@ public class LoginUserUseCaseImpl implements LoginUserUseCase {
 
     @Override
     public String login(String username, String password) {
+        if (!StringUtils.hasText(username) || !StringUtils.hasText(password)) {
+            throw new IllegalArgumentException("Username and password must not be empty");
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        // TODO: Obtener los roles reales del UserDetails si es necesario, o del User de dominio
         return jwtUtil.generateToken(userDetails.getUsername(), new HashSet<>(Collections.singletonList("USER")));
     }
 }

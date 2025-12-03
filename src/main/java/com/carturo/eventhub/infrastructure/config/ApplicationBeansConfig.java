@@ -24,6 +24,7 @@ import com.carturo.eventhub.domain.ports.in.query.venue.GetVenueByIdQuery;
 import com.carturo.eventhub.domain.ports.in.query.venue.ListVenuesQuery;
 import com.carturo.eventhub.domain.ports.out.EventRepositoryPort;
 import com.carturo.eventhub.domain.ports.out.VenueRepositoryPort;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,8 +33,8 @@ public class ApplicationBeansConfig {
 
     // ===== Event UseCases =====
     @Bean
-    public CreateEventUseCase createEventUseCase(EventRepositoryPort eventRepositoryPort) {
-        return new CreateEventUseCaseImpl(eventRepositoryPort);
+    public CreateEventUseCase createEventUseCase(EventRepositoryPort eventRepositoryPort, MeterRegistry meterRegistry) {
+        return new CreateEventUseCaseImpl(eventRepositoryPort, meterRegistry);
     }
 
     @Bean
