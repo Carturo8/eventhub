@@ -19,6 +19,9 @@ public class ListVenuesQueryImpl implements ListVenuesQuery {
 
     @Override
     public PageResult<Venue> list(PageRequest pageRequest, VenueFilter filter) {
+        if (pageRequest == null) {
+            throw new IllegalArgumentException("Page request must not be null");
+        }
         return venueRepositoryPort.findAll(pageRequest, filter);
     }
 }

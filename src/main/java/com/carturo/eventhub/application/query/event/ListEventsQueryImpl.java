@@ -18,6 +18,9 @@ public class ListEventsQueryImpl implements ListEventsQuery {
 
     @Override
     public PageResult<Event> list(PageRequest pageRequest) {
+        if (pageRequest == null) {
+            throw new IllegalArgumentException("Page request must not be null");
+        }
         return eventRepositoryPort.findAll(pageRequest);
     }
 }
