@@ -1,0 +1,11 @@
+# Example local configuration. Copy this file to 'application-local.yml' and fill in your actual values.
+# The 'application-local.yml' file should NOT be committed to version control.
+
+# Full JDBC URL for your PostgreSQL database connection.
+DB_URL: jdbc:postgresql://your_database_host:your_port/your_database_name
+
+# Username for the database connection.
+DB_USERNAME: your_database_user
+
+# Password for the database connection.
+DB_PASSWORD: your_secret_password

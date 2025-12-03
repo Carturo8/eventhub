@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: eventhub
+
+  config:
+    import: optional:application-local.yml
+
+  profiles:
+    active: dev
+
+server:
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: always
+    include-binding-errors: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
