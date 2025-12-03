@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/eventhub
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: prod
+      JWT_SECRET: ${JWT_SECRET}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    depends_on:
+      - db
+      - eureka-server
+    networks:
+      - eventhub-network
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: eventhub
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - eventhub-network
+
+  eureka-server:
+    image: springcloud/eureka
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+      EUREKA_SERVER_WAIT_TIME_IN_MS_WHEN_EMPTY: "0"
+    networks:
+      - eventhub-network
+
+volumes:
+  db-data:
+
+networks:
+  eventhub-network:
+    driver: bridge
