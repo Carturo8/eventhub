@@ -19,6 +19,9 @@ public class SearchEventsQueryImpl implements SearchEventsQuery {
 
     @Override
     public PageResult<Event> search(EventFilter filter, PageRequest pageRequest) {
+        if (pageRequest == null) {
+            throw new IllegalArgumentException("Page request must not be null");
+        }
         return eventRepositoryPort.search(filter, pageRequest);
     }
 }
